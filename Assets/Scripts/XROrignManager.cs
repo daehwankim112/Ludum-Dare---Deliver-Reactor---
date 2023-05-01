@@ -23,22 +23,31 @@ public class XROrignManager : MonoBehaviour
         {
             this.transform.localPosition = new Vector3(3.1f, 0, 0);
             started= true;
-            GameManager.Instance.State = GameManager.GameState.Idle;
+            GameManager.Instance.UpdateGameState(GameManager.GameState.Idle);
+            Debug.Log("Bug! gamestate: " + GameManager.Instance.State);
         }
     }
 
     private void Update()
     {
-        if ( transform.position.x < -2.5f || transform.position.x > 2.2 )
+        if ( transform.position.x < -2.5f || transform.position.x > 2.2f )
         {
             inBorder = false;
+            Debug.Log("inBorder: " + inBorder);
+            if ( GameManager.Instance.State == GameManager.GameState.Shooting )
+            {
+                GameManager.Instance.UpdateGameState(GameManager.GameState.Searching);
+                searching = true;
+            }
         }
         else
         {
             inBorder = true;
-            if ( GameManager.Instance.State == GameManager.GameState.Searching )
+            if ( searching )
             {
-                GameManager.Instance.State = GameManager.GameState.Shooting;
+                Debug.Log("Found! Start shooting");
+                GameManager.Instance.UpdateGameState(GameManager.GameState.Shooting);
+                searching = false;
             }
         }
     }

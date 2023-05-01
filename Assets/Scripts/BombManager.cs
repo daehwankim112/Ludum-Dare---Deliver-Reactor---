@@ -17,16 +17,19 @@ public class BombManager : MonoBehaviour
         exploding = false;
     }
 
-    public async void Bombed()
+    public IEnumerator Bombed()
     {
-        dropping.Play();
-        Debug.Log("Dropping");
-        await Task.Delay((int)(dropping.clip.length * 1000));
-        explosion.Play();
-        exploding = true;
-        Debug.Log("Explodding");
-        await Task.Delay((int)(explosion.clip.length * 1000));
-        exploding = false;
-        GameManager.Instance.UpdateGameState(GameManager.GameState.Idle);
+        if ( GameManager.Instance.State == GameManager.GameState.Bombed )
+        {
+            dropping.Play();
+            Debug.Log("Dropping " + dropping.clip.length);
+            yield return new WaitForSeconds(dropping.clip.length);
+            explosion.Play();
+            exploding = true;
+            Debug.Log("Explodding " + explosion.clip.length);
+            yield return new WaitForSeconds(explosion.clip.length);
+            exploding = false;
+            GameManager.Instance.UpdateGameState(GameManager.GameState.Idle);
+        }
     }
 }

@@ -19,7 +19,12 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        UpdateGameState(GameState.Bombed);        
+        UpdateGameState(GameState.Shooting);        
+    }
+
+    private void Update()
+    {
+        Debug.Log("State: " + State);
     }
 
     public void UpdateGameState(GameState newState)
@@ -39,7 +44,7 @@ public class GameManager : MonoBehaviour
                 HandleShooting();
                 break;
             case GameState.Idle:
-                HandleIdle();
+                StartCoroutine(HandleIdle());
                 break;
             case GameState.Searching:
                 HandleSearching();
@@ -54,36 +59,40 @@ public class GameManager : MonoBehaviour
 
     private void HandleSearching()
     {
-        XROrignManager.Instance.searching = true;
+        Debug.Log("Seaching");
         for ( float timer = 4; timer > 0; timer -= Time.deltaTime )
         {
             if ( State != GameState.Searching )
             {
-                timer = 4;
+                return;
             }
+            Debug.Log("timer: " + timer);
         }
-        State = GameState.Idle;
+        UpdateGameState(GameState.Idle);
     }
 
     private void HandleShooting()
     {
-        TowerManager.Instance.Shooting();
+        Debug.Log("HandleShooting triggered");
     }
 
-    private async void HandleIdle()
+    private IEnumerator HandleIdle()
     {
         if ( State == GameState.Idle)   
         {
             float time = UnityEngine.Random.Range(5, 10);
             Debug.Log("Waiting time: " + time);
-            await Task.Delay((int)(time * 1000));
-            UpdateGameState(GameState.Bombed);
+            yield return new WaitForSeconds(time);
+            if ( State == GameState.Idle )
+            {
+                UpdateGameState(GameState.Bombed);
+            }
         }
     }
 
     private void HandleBombed()
     {
-        BombManager.Instance.Bombed();
+        StartCoroutine(BombManager.Instance.Bombed());
     }
 
     private void HandleStart()
