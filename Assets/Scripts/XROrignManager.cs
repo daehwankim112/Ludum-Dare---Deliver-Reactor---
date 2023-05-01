@@ -9,10 +9,13 @@ public class XROrignManager : MonoBehaviour
     public bool started;
     public bool inBorder;
 
+    public bool idleToSearching;
+
     void Awake()
     {
         Instance = this;
         started = false;
+        idleToSearching = false;
         if (transform.position.x < -2.5f || transform.position.x > 2.2f)
         {
             inBorder = false;
@@ -45,6 +48,12 @@ public class XROrignManager : MonoBehaviour
         else
         {
             inBorder = true;
+            Debug.Log("inBorder: " + inBorder);
+            if ( GameManager.Instance.State == GameManager.GameState.Idle && ! idleToSearching )
+            {
+                idleToSearching = true;
+                GameManager.Instance.UpdateGameState(GameManager.GameState.Shooting);
+            }
         }
     }
 }

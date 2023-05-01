@@ -12,19 +12,31 @@ public class GameManager : MonoBehaviour
 
     public static event Action<GameState> OnGameStateChanged;
 
+    private float gameTimer;
+    private bool everChangedFromSearching;
+    private bool everChangedFromSearchingActivate;
+
     void Awake()
     {
         Instance = this;
+        gameTimer = 0;
     }
 
     void Start()
     {
-        UpdateGameState(GameState.Shooting);        
+        UpdateGameState(GameState.Start);
+        everChangedFromSearching = false;
+        everChangedFromSearchingActivate = false;
     }
 
     private void Update()
     {
         Debug.Log("State: " + State);
+        gameTimer += Time.deltaTime;
+        if ( ! everChangedFromSearching && State != GameState.Searching && everChangedFromSearchingActivate)
+        {
+            everChangedFromSearching = true;
+        }
     }
 
     public void UpdateGameState(GameState newState)
@@ -47,7 +59,7 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(HandleIdle());
                 break;
             case GameState.Searching:
-                HandleSearching();
+                StartCoroutine(HandleSearching());
                 break;
             case GameState.Bombed:
                 HandleBombed();
@@ -57,18 +69,24 @@ public class GameManager : MonoBehaviour
         OnGameStateChanged?.Invoke(newState);
     }
 
-    private void HandleSearching()
+    private IEnumerator HandleSearching()
     {
         Debug.Log("Seaching");
-        for ( float timer = 4; timer > 0; timer -= Time.deltaTime )
+        float timer = gameTimer;
+        everChangedFromSearching = false;
+        everChangedFromSearchingActivate = true;
+        yield return new WaitForSeconds(4);
+        if ( everChangedFromSearching )
         {
-            if ( State != GameState.Searching )
-            {
-                return;
-            }
-            // Debug.Log("timer: " + timer);
+            Debug.Log("State is not Searching. State: " + State);
         }
-        UpdateGameState(GameState.Idle);
+        else
+        {
+            Debug.Log("Time is up");
+            UpdateGameState(GameState.Idle);
+        }
+        everChangedFromSearching = false;
+        everChangedFromSearchingActivate = false;
     }
 
     private void HandleShooting()
@@ -81,12 +99,17 @@ public class GameManager : MonoBehaviour
     {
         if ( State == GameState.Idle)   
         {
+            TowerManager.Instance.LightToggle(false);
             float time = UnityEngine.Random.Range(5, 10);
             Debug.Log("Waiting time: " + time);
             yield return new WaitForSeconds(time);
-            if ( State == GameState.Idle )
+            if ( State == GameState.Idle && ! XROrignManager.Instance.idleToSearching )
             {
                 UpdateGameState(GameState.Bombed);
+            }
+            else if ( State == GameState.Idle && XROrignManager.Instance.idleToSearching )
+            {
+                XROrignManager.Instance.idleToSearching = false;
             }
         }
     }
