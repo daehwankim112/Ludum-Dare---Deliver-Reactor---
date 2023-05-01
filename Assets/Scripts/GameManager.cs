@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
             {
                 return;
             }
-            Debug.Log("timer: " + timer);
+            // Debug.Log("timer: " + timer);
         }
         UpdateGameState(GameState.Idle);
     }
@@ -74,6 +74,7 @@ public class GameManager : MonoBehaviour
     private void HandleShooting()
     {
         Debug.Log("HandleShooting triggered");
+        OnGameStateChanged += TowerManager.Instance.GameManagerOnGameStateChangedTower;
     }
 
     private IEnumerator HandleIdle()
@@ -97,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleStart()
     {
-        OnGameStateChanged += XROrignManager.Instance.GameManagerOnGameStateChanged;
+        OnGameStateChanged += XROrignManager.Instance.GameManagerOnGameStateChangedXROrigin;
     }
 
     public enum GameState {
