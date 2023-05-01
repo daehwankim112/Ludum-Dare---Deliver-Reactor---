@@ -62,10 +62,18 @@ public class TowerManager : MonoBehaviour
     private void Shooting()
     {
         Debug.Log("Inside Shooting function");
-        Vector3 direction = lightTransform.forward;
-        Debug.Log(direction.ToString());
-        Ray theRay = new Ray(lightTransform.position, transform.TransformDirection(direction * Range));
-        Debug.DrawLine(lightTransform.position, transform.TransformDirection(direction * Range));
+        Vector3 direction = (( XROrignManager.Instance.transform.GetChild(0).transform.GetChild(0).transform.position ) - lightGameObject.transform.position);
+        Debug.Log(lightGameObject.transform.position + ", " + XROrignManager.Instance.transform.GetChild(0).transform.GetChild(0).transform.position);
+        Ray theRay = new Ray(lightGameObject.transform.position, transform.TransformDirection(direction * Range));
+        Debug.DrawLine(lightGameObject.transform.position, transform.TransformDirection(direction * Range));
+
+        RaycastHit hitData;
+
+        if ( Physics.Raycast(theRay, out hitData, Range ) )
+        {
+            print("It's hitting something");
+            print("Something is: " + hitData.collider.gameObject.name);
+        }
     }
 
     public void ShootingDecision()
