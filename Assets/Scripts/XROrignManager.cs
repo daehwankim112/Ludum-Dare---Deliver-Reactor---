@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using UnityEngine;
 
 public class XROrignManager : MonoBehaviour
@@ -55,5 +56,10 @@ public class XROrignManager : MonoBehaviour
                 GameManager.Instance.UpdateGameState(GameManager.GameState.Shooting);
             }
         }
+    }
+
+    public void Lose()
+    {
+        GameManager.Instance.UpdateGameState(GameManager.GameState.Start);
     }
 }

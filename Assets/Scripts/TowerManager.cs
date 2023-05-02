@@ -30,7 +30,7 @@ public class TowerManager : MonoBehaviour
     {
         Instance = this;
         exposedTime = 0;
-        exposedTimeLimit = 40f;
+        exposedTimeLimit = 5f;
     }
 
     private void Start()
@@ -43,6 +43,7 @@ public class TowerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if (GameManager.Instance.State == GameManager.GameState.Searching)
         {
             searching = true;
@@ -51,6 +52,17 @@ public class TowerManager : MonoBehaviour
                 exposedTime -= Time.deltaTime;
             }
             else if ( exposedTime < 0 )
+            {
+                exposedTime = 0;
+            }
+        }
+        else if (GameManager.Instance.State == GameManager.GameState.Idle)
+        {
+            if (exposedTime > 0)
+            {
+                exposedTime -= Time.deltaTime;
+            }
+            else if (exposedTime < 0)
             {
                 exposedTime = 0;
             }
@@ -95,14 +107,17 @@ public class TowerManager : MonoBehaviour
     {
         if( ! rifleSilenced.isPlaying )
         {
+            rifleSilenced.volume = 1;
             rifleSilenced.Play();
         }
         if (!visceralBulletImpact.isPlaying)
         {
+            visceralBulletImpact.volume = 1;
             visceralBulletImpact.Play();
         }
         if (!bulletRicochet.isPlaying)
         {
+            bulletRicochet.volume = 1;
             bulletRicochet.Play();
         }
 
@@ -165,5 +180,18 @@ public class TowerManager : MonoBehaviour
                 lightGameObject.SetActive(false);
             }
         }
+    }
+
+    internal void Lose()
+    {
+        for ( int i = 100; i > 0; i -- )
+        {
+            rifleSilenced.volume = (float) i / 100;
+            visceralBulletImpact.volume = (float)i / 100;
+            bulletRicochet.volume = (float)i / 100;
+        }
+        rifleSilenced.Pause();
+        visceralBulletImpact.Pause();
+        bulletRicochet.Pause();
     }
 }
